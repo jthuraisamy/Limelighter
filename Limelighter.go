@@ -25,6 +25,7 @@ type FlagOptions struct {
 	outFile   string
 	inputFile string
 	domain    string
+	padding   int
 	password  string
 	real      string
 	verify    string
@@ -62,7 +63,7 @@ func RandStringBytes(n int) string {
 	return string(b)
 }
 
-func GenerateCert(domain string, inputFile string) {
+func GenerateCert(domain string, inputFile string, padding int) {
 	var err error
 	rootKey, err := rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
@@ -95,7 +96,7 @@ func GenerateCert(domain string, inputFile string) {
 	IssuerTemplate := x509.Certificate{
 		SerialNumber: cert.SerialNumber,
 		Subject: pkix.Name{
-			CommonName: cert.Issuer.CommonName,
+			CommonName: cert.Issuer.CommonName + strings.Repeat(" ", padding),
 		},
 		NotBefore: cert.NotBefore,
 		NotAfter:  cert.NotAfter,
@@ -189,6 +190,7 @@ func options() *FlagOptions {
 	outFile := flag.String("O", "", "Signed file name")
 	inputFile := flag.String("I", "", "Unsiged file name to be signed")
 	domain := flag.String("Domain", "", "Domain you want to create a fake code sign for")
+	padding := flag.String("Padding", 0, "Number of bytes to increase the certificate size")
 	password := flag.String("Password", "", "Password for real certificate")
 	real := flag.String("Real", "", "Path to a valid .pfx certificate file")
 	verify := flag.String("Verify", "", "Verifies a file's code sign certificate")
@@ -196,7 +198,7 @@ func options() *FlagOptions {
 	flag.Parse()
 	debugging = *debug
 	debugWriter = os.Stdout
-	return &FlagOptions{outFile: *outFile, inputFile: *inputFile, domain: *domain, password: *password, real: *real, verify: *verify}
+	return &FlagOptions{outFile: *outFile, inputFile: *inputFile, domain: *domain, padding: *padding, password: *password, real: *real, verify: *verify}
 }
 
 func main() {
@@ -240,7 +242,7 @@ func main() {
 		password := VarNumberLength(8, 12)
 		pfx := opt.domain + ".pfx"
 		fmt.Println("[*] Signing " + opt.inputFile + " with a fake cert")
-		GenerateCert(opt.domain, opt.inputFile)
+		GenerateCert(opt.domain, opt.inputFile, opt.padding)
 		GeneratePFK(password, opt.domain)
 		SignExecutable(password, pfx, opt.inputFile, opt.outFile)
 
