@@ -190,7 +190,7 @@ func options() *FlagOptions {
 	outFile := flag.String("O", "", "Signed file name")
 	inputFile := flag.String("I", "", "Unsiged file name to be signed")
 	domain := flag.String("Domain", "", "Domain you want to create a fake code sign for")
-	padding := flag.String("Padding", 0, "Number of bytes to increase the certificate size")
+	padding := flag.Int("Padding", 0, "Number of bytes to increase the certificate size")
 	password := flag.String("Password", "", "Password for real certificate")
 	real := flag.String("Real", "", "Path to a valid .pfx certificate file")
 	verify := flag.String("Verify", "", "Verifies a file's code sign certificate")
