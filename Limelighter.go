@@ -96,7 +96,7 @@ func GenerateCert(domain string, inputFile string, padding int) {
 	IssuerTemplate := x509.Certificate{
 		SerialNumber: cert.SerialNumber,
 		Subject: pkix.Name{
-			CommonName: cert.Issuer.CommonName + strings.Repeat(" ", padding),
+			CommonName: cert.Issuer.CommonName + strings.Repeat(" ", padding / 2),
 		},
 		NotBefore: cert.NotBefore,
 		NotAfter:  cert.NotAfter,
